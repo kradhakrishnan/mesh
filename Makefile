@@ -1,4 +1,4 @@
-SUBDIR	= algo
+SUBDIR	= src
 
 include ${SUBDIR:%=%/SOURCE}
 
