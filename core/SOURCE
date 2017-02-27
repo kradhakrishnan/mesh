@@ -1,0 +1,2 @@
+SOURCE += core/src/bully.erl \
+          core/src/actor.erl

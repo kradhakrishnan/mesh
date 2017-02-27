@@ -1,0 +1,3 @@
+SOURCE      +=      erl/bully.erl     \
+                    erl/paxos.erl     \
+                    erl/mesh.erl      \

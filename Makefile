@@ -1,4 +1,4 @@
-SUBDIR	= src
+SUBDIR	= core
 
 include ${SUBDIR:%=%/SOURCE}
 
@@ -8,7 +8,10 @@ EFLAGS=-W1
 DIALYZER=/usr/bin/dialyzer
 DIALYZER_OPT=--quiet --plt $(BIN)/mesh.plt
 
-TARGETS=$(SOURCE:%.erl=$(BIN)/%.beam)
+# Elixir
+ELIXIRC=/usr/bin/elixirc
+
+TARGETS=$(SOURCE:%.erl=%.beam) $(SOURCE:%.ex=%.beam)
 
 setup:
 ifeq ($(wildcard $(BIN)/mesh.plt),)
@@ -24,9 +27,18 @@ clean:
 	@echo 'CLEAN'
 	@rm -r -f $(BIN)
 
-$(BIN)/%.beam: %.erl
-	@echo 'DIALYZER      ' $@
-	@mkdir -p $(shell dirname $@)
+.SUFFIXES: .erl .ex .beam
+
+.erl.beam:
+	@mkdir -p $(shell dirname $(BIN)/$@)
+	@echo 'ERLC       ' $<
+	@$(ERLC) -W -b beam -o $(shell dirname $(BIN)/$@) $(EFLAGS) $(WAIT) $< 
+	@echo 'DIALYZER   ' $<
 	@$(DIALYZER) $(DIALYZER_OPT) --src $<
-	@echo 'ERLC          ' $@
-	@$(ERLC) -W -b beam -o $(shell dirname $@) $(EFLAGS) $(WAIT) $< 
+.ex.beam:
+		@mkdir -p $(shell dirname $(BIN)/$@)
+		@echo 'ELIXIRC		' $<
+		@$(ELIXIRC) -o $(shell dirname $(BIN)/$@) $(WAIT) $<
+		@echo 'DIALYZER      ' $@
+		@$(DIALYZER) $(DIALYZER_OPT) $(shell dirname $(BIN)/$@)/*.beam
+
